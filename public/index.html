@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezervo Kosovë</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09080A;--surface:#131016;--s2:#1C1A21;
+  --gold:#C8A96E;--gold-l:#E2C98A;--cream:#F0E8D8;
+  --muted:#7A7080;--green:#3A8C5C;--red:#C04040;
+  --border:rgba(200,169,110,0.18);
+}
+body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100vh}
+h1,h2,h3,.serif{font-family:'Cormorant Garamond',serif}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+input,select,textarea{
+  background:var(--s2);border:1px solid var(--border);color:var(--cream);
+  border-radius:10px;padding:13px 16px;font-family:'DM Sans',sans-serif;
+  font-size:14px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s
+}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,169,110,.1)}
+select option{background:#1C1A21}
+textarea{resize:vertical;min-height:76px}
+
+.btn-gold{
+  background:linear-gradient(135deg,#B8943E,#E2C98A,#B8943E);
+  color:#1a1308;border:none;border-radius:12px;padding:15px 28px;
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:15px;
+  cursor:pointer;transition:all .3s;width:100%
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,169,110,.3)}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;color:var(--muted);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;transition:color .2s}
+.btn-ghost:hover{color:var(--cream)}
+.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.05em}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:block}
+
+/* HOME */
+.topbar{
+  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:18px 24px;position:sticky;top:0;z-index:20;
+  backdrop-filter:blur(12px)
+}
+.search-wrap{position:relative;margin-bottom:12px}
+.search-wrap input{padding-left:42px}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
+.city-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.city-btn{
+  background:var(--s2);color:var(--muted);border:1px solid var(--border);
+  border-radius:20px;padding:6px 16px;font-size:12px;font-weight:500;
+  cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif
+}
+.city-btn.active{background:var(--gold);color:#1a1308;border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;padding:24px}
+
+/* Restaurant card */
+.r-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  overflow:hidden;cursor:pointer;transition:all .35s;
+  animation:fadeUp .4s ease both
+}
+.r-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.r-card-hero{height:130px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.r-card-symbol{font-size:80px;opacity:.15;transition:transform .5s}
+.r-card:hover .r-card-symbol{transform:scale(1.15)}
+.r-card-fade{position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,var(--surface),transparent)}
+.r-card-badge{position:absolute;top:12px;right:12px}
+.r-card-body{padding:14px 18px 18px}
+
+/* Detail */
+.detail-hero{height:210px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.info-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+
+/* Form */
+.form-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:18px}
+.form-row{display:grid;gap:14px;margin-bottom:14px}
+.form-row.two{grid-template-columns:1fr 1fr}
+.lbl{font-size:11px;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+.persons-row{display:flex;gap:9px;flex-wrap:wrap}
+.p-btn{
+  width:48px;height:48px;border-radius:11px;font-weight:600;font-size:15px;
+  cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;
+  background:var(--s2);color:var(--cream);border:1px solid var(--border)
+}
+.p-btn.active{background:var(--gold);color:#1a1308;border-color:var(--gold)}
+.summary-box{background:rgba(200,169,110,.06);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-top:14px}
+
+/* Status */
+.status-center{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.spinner{width:88px;height:88px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--gold);animation:spin 1.5s linear infinite;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;position:relative}
+.spinner::after{content:"⏳";font-size:30px;position:absolute}
+.s-icon{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 28px}
+.status-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:360px;width:100%;margin:16px auto}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--gold);border-radius:16px;padding:16px 20px;max-width:300px;z-index:999;display:none;animation:slideDown .4s ease}
+</style>
+</head>
+<body>
+
+<!-- ══ HOME SCREEN ══════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="topbar">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div style="font-size:10px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:3px">Platforma</div>
+        <h1 class="serif" style="font-size:26px;font-weight:400;background:linear-gradient(135deg,var(--gold),var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Rezervo Kosovë</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></div>
+        <span style="font-size:11px;color:var(--muted)" id="rest-count">…</span>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="search" type="text" placeholder="Kërko restorant...">
+    </div>
+    <div class="city-row" id="city-row"></div>
+  </div>
+  <div class="grid" id="rest-grid"></div>
+</div>
+
+<!-- ══ DETAIL SCREEN ════════════════════════════════════ -->
+<div id="screen-detail" class="screen">
+  <div id="detail-hero" class="detail-hero"></div>
+  <div style="max-width:600px;margin:0 auto;padding:0 22px 50px">
+    <p id="detail-desc" style="font-size:15px;color:var(--muted);line-height:1.8;margin:22px 0"></p>
+    <div class="info-grid" id="detail-info"></div>
+    <button class="btn-gold" onclick="goBooking()">✦ Bëj Rezervim</button>
+  </div>
+</div>
+
+<!-- ══ BOOKING SCREEN ═══════════════════════════════════ -->
+<div id="screen-booking" class="screen">
+  <div style="background:var(--bg);border-bottom:1px solid var(--border);padding:18px 22px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)">
+    <button class="btn-ghost" onclick="goDetail()" style="border:1px solid var(--border);border-radius:10px;padding:8px 14px">← Kthehu</button>
+    <div>
+      <div class="serif" style="font-size:17px;font-weight:500" id="book-rest-name"></div>
+      <div style="font-size:12px;color:var(--muted)" id="book-rest-city"></div>
+    </div>
+  </div>
+  <div style="max-width:540px;margin:0 auto;padding:28px 22px 60px">
+    <div class="form-box">
+      <h2 class="serif" style="font-size:24px;font-weight:400;margin-bottom:4px">Detajet e Rezervimit</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:22px">Plotëso formularin dhe menaxheri do të konfirmojë</p>
+      <div class="form-row two">
+        <div><label class="lbl">Emri & Mbiemri *</label><input id="f-name" placeholder="Agim Berisha"></div>
+        <div><label class="lbl">Telefoni</label><input id="f-phone" type="tel" placeholder="+383 44..."></div>
+      </div>
+      <div class="form-row">
+        <div><label class="lbl">Email (për konfirmim) *</label><input id="f-email" type="email" placeholder="agim@gmail.com"></div>
+      </div>
+      <div class="form-row two">
+        <div><label class="lbl">Data *</label><input id="f-date" type="date"></div>
+        <div>
+          <label class="lbl">Ora *</label>
+          <select id="f-time"><option value="">Zgjidh orën</option></select>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="lbl">Numri i Personave *</label>
+        <div class="persons-row" id="persons-row"></div>
+      </div>
+      <div>
+        <label class="lbl">Shënime (opsionale)</label>
+        <textarea id="f-notes" placeholder="Preferenca speciale, ditëlindje, tavolinë jashtë..."></textarea>
+      </div>
+      <div class="summary-box" id="summary" style="display:none">
+        <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Rezyme</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:13px;color:var(--muted)" id="summary-content"></div>
+      </div>
+    </div>
+    <button class="btn-gold" id="submit-btn" onclick="submitReservation()" disabled>✦ Dërgo Rezervimin</button>
+    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">📧 Konfirmimi dërgohet automatikisht në email</p>
+  </div>
+</div>
+
+<!-- ══ STATUS SCREEN ════════════════════════════════════ -->
+<div id="screen-status" class="screen">
+  <div class="status-center">
+    <div id="st-icon"></div>
+    <h2 class="serif" id="st-title" style="font-size:32px;font-weight:400;margin-bottom:10px"></h2>
+    <p id="st-desc" style="color:var(--muted);line-height:1.7;max-width:310px;margin:0 auto 20px"></p>
+    <div class="status-card" id="st-card"></div>
+    <div style="margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button onclick="resetHome()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:12px 22px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px">← Rezervim i ri</button>
+    </div>
+    <p id="st-hint" style="margin-top:18px;font-size:11px;color:var(--muted);opacity:.5"></p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────
+let restaurants = [];
+let selectedRest = null;
+let selectedPersons = 2;
+let currentReservationId = null;
+let evtSource = null;
+let activeCity = 'Të gjitha';
+
+// ─── Init ─────────────────────────────────────────────────────────────────
+document.getElementById('f-date').min = new Date().toISOString().split('T')[0];
+
+const timeSelect = document.getElementById('f-time');
+for(let h=10;h<=23;h++) for(let m of['00','30']){
+  if(h===23&&m==='30') break;
+  const o=document.createElement('option');o.value=o.textContent=`${h}:${m}`;timeSelect.appendChild(o);
+}
+
+const personsRow = document.getElementById('persons-row');
+[1,2,3,4,5,6,7,8,10,12].forEach(n=>{
+  const b=document.createElement('button');
+  b.className='p-btn'+(n===2?' active':'');b.textContent=n;
+  b.onclick=()=>{document.querySelectorAll('.p-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');selectedPersons=n;updateSummary();};
+  personsRow.appendChild(b);
+});
+
+['f-name','f-email','f-date','f-time'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{validateForm();updateSummary();});
+});
+
+document.getElementById('search').addEventListener('input', renderGrid);
+
+// ─── Fetch restaurants ────────────────────────────────────────────────────
+async function loadRestaurants(){
+  const r = await fetch('/api/restaurants');
+  restaurants = await r.json();
+  document.getElementById('rest-count').textContent = restaurants.length+' restorante';
+  buildCityFilter();
+  renderGrid();
+}
+
+function buildCityFilter(){
+  const cities = ['Të gjitha',...new Set(restaurants.map(r=>r.city))];
+  const row = document.getElementById('city-row');
+  row.innerHTML='';
+  cities.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='city-btn'+(c===activeCity?' active':'');
+    b.textContent=c;
+    b.onclick=()=>{activeCity=c;document.querySelectorAll('.city-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderGrid();};
+    row.appendChild(b);
+  });
+}
+
+function renderGrid(){
+  const q = document.getElementById('search').value.toLowerCase();
+  const list = restaurants.filter(r=>{
+    const matchCity = activeCity==='Të gjitha'||r.city===activeCity;
+    const matchQ = !q||r.name.toLowerCase().includes(q)||r.cuisine.toLowerCase().includes(q)||r.city.toLowerCase().includes(q);
+    return matchCity&&matchQ;
+  });
+  const grid = document.getElementById('rest-grid');
+  grid.innerHTML='';
+  if(!list.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">🍽</div><p>Nuk u gjet asnjë restorant</p></div>';return;}
+  list.forEach((r,i)=>{
+    const d=document.createElement('div');d.className='r-card';d.style.animationDelay=(i*.06)+'s';
+    d.innerHTML=`
+      <div class="r-card-hero" style="background:linear-gradient(${r.gradient})">
+        <div class="r-card-symbol">${r.emoji}</div>
+        <div class="r-card-fade"></div>
+        <div class="r-card-badge"><span class="tag" style="background:rgba(255,255,255,.07);color:var(--cream);border:1px solid rgba(255,255,255,.12);font-size:10px">${r.cuisine}</span></div>
+      </div>
+      <div class="r-card-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <h3 class="serif" style="font-size:19px;font-weight:500;line-height:1.2">${r.name}</h3>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">📍 ${r.city}</div>
+        <div style="display:flex;justify-content:flex-end"><span style="font-size:12px;color:var(--gold);font-weight:500">Rezervo →</span></div>
+      </div>`;
+    d.onclick=()=>goDetail(r);
+    grid.appendChild(d);
+  });
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────────
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+
+function goDetail(r){
+  selectedRest=r;
+  const hero=document.getElementById('detail-hero');
+  hero.style.background=`linear-gradient(${r.gradient})`;
+  hero.innerHTML=`
+    <div style="font-size:100px;opacity:.12">${r.emoji}</div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%)"></div>
+    <button onclick="show('screen-home')" style="position:absolute;top:18px;left:18px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 14px;color:var(--cream);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px">← Kthehu</button>
+    <div style="position:absolute;bottom:20px;left:22px;right:22px">
+      <span class="tag" style="background:rgba(255,255,255,.08);color:var(--cream);border:1px solid rgba(255,255,255,.12);margin-bottom:8px">${r.cuisine} · ${r.city}</span>
+      <h2 class="serif" style="font-size:clamp(24px,5vw,36px);font-weight:400">${r.name}</h2>
+    </div>`;
+  document.getElementById('detail-desc').textContent = `Restoranti ${r.name} në ${r.city} — kuzhina ${r.cuisine.toLowerCase()} e klasit të lartë. Rezervoni tavolinën tuaj sot dhe shijoni eksperiencën gastronomike.`;
+  document.getElementById('detail-info').innerHTML=[
+    {icon:'🕐',lbl:'Orari',val:'12:00 – 23:00'},
+    {icon:'📍',lbl:'Qyteti',val:r.city},
+    {icon:'🍽',lbl:'Kuzhina',val:r.cuisine},
+    {icon:'👥',lbl:'Kapaciteti',val:'50+ vende'},
+  ].map(x=>`<div class="info-card"><div style="font-size:18px;margin-bottom:5px">${x.icon}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">${x.lbl}</div><div style="font-size:13px;font-weight:500">${x.val}</div></div>`).join('');
+  show('screen-detail');
+}
+
+function goBooking(){
+  document.getElementById('book-rest-name').textContent=selectedRest.name;
+  document.getElementById('book-rest-city').textContent=selectedRest.city;
+  show('screen-booking');
+}
+
+function goDetail2(){show('screen-detail');}
+
+// ─── Form ─────────────────────────────────────────────────────────────────
+function validateForm(){
+  const ok=document.getElementById('f-name').value.trim()&&
+            document.getElementById('f-email').value.includes('@')&&
+            document.getElementById('f-date').value&&
+            document.getElementById('f-time').value;
+  document.getElementById('submit-btn').disabled=!ok;
+}
+
+function updateSummary(){
+  const name=document.getElementById('f-name').value.trim();
+  const date=document.getElementById('f-date').value;
+  const time=document.getElementById('f-time').value;
+  const el=document.getElementById('summary');
+  if(name&&date&&time){
+    el.style.display='block';
+    document.getElementById('summary-content').innerHTML=`
+      <span>🏪 ${selectedRest?.name||''}</span><span>📅 ${date}</span>
+      <span>🕐 ${time}</span><span>👥 ${selectedPersons} persona</span>`;
+  }else{el.style.display='none';}
+}
+
+// ─── Submit ────────────────────────────────────────────────────────────────
+async function submitReservation(){
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='Duke dërguar...';
+  const body={
+    name:document.getElementById('f-name').value.trim(),
+    email:document.getElementById('f-email').value.trim(),
+    phone:document.getElementById('f-phone').value.trim(),
+    date:document.getElementById('f-date').value,
+    time:document.getElementById('f-time').value,
+    persons:selectedPersons,
+    notes:document.getElementById('f-notes').value.trim(),
+    restaurantId:selectedRest.id,
+    restaurantName:selectedRest.name,
+    restaurantCity:selectedRest.city,
+  };
+  try{
+    const res=await fetch('/api/reservations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const reservation=await res.json();
+    currentReservationId=reservation.id;
+    showWaiting(reservation);
+    startSSE();
+  }catch(e){
+    btn.disabled=false;btn.textContent='✦ Dërgo Rezervimin';
+    showToast('❌ Gabim! Kontrollo lidhjen.','#C04040');
+  }
+}
+
+// ─── SSE ──────────────────────────────────────────────────────────────────
+function startSSE(){
+  if(evtSource)evtSource.close();
+  evtSource=new EventSource('/api/events');
+  evtSource.onmessage=(e)=>{
+    const data=JSON.parse(e.data);
+    if(data.type==='status_update'&&data.id===currentReservationId) updateStatus(data.status);
+  };
+  evtSource.onerror=()=>setTimeout(()=>pollStatus(),3000);
+}
+
+async function pollStatus(){
+  if(!currentReservationId)return;
+  try{
+    const res=await fetch('/api/reservations');
+    const all=await res.json();
+    const r=all.find(x=>x.id===currentReservationId);
+    if(r&&r.status!=='pending')updateStatus(r.status);
+    else setTimeout(()=>pollStatus(),3000);
+  }catch{setTimeout(()=>pollStatus(),4000);}
+}
+
+// ─── Status screens ───────────────────────────────────────────────────────
+function showWaiting(reservation){
+  document.getElementById('st-icon').innerHTML=`<div class="spinner"></div>`;
+  document.getElementById('st-title').textContent='Duke pritur konfirmimin...';
+  document.getElementById('st-title').style.color='var(--cream)';
+  document.getElementById('st-desc').innerHTML=`Rezervimi u dërgua tek <strong style="color:var(--cream)">${reservation.restaurantName}</strong>.<br>Menaxheri do të konfirmojë nga telefoni.`;
+  document.getElementById('st-card').innerHTML=`
+    <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Detajet</div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);text-align:left">
+      <div>👤 ${reservation.name}</div><div>📧 ${reservation.email}</div>
+      <div>📅 ${reservation.date} &nbsp; 🕐 ${reservation.time}</div>
+      <div>👥 ${reservation.persons} persona</div>
+      <div style="margin-top:8px"><span class="tag" style="background:rgba(200,169,110,.1);color:var(--gold);border:1px solid rgba(200,169,110,.2)">⏳ Në pritje</span></div>
+    </div>`;
+  document.getElementById('st-hint').textContent='🔄 Lidhur live — do të njoftohesh menjëherë';
+  show('screen-status');
+}
+
+function updateStatus(status){
+  if(evtSource){evtSource.close();evtSource=null;}
+  document.getElementById('st-hint').textContent='';
+  if(status==='confirmed'){
+    document.getElementById('st-icon').innerHTML=`<div class="s-icon" style="background:rgba(58,140,92,.15);border:2px solid rgba(58,140,92,.4)">✓</div>`;
+    document.getElementById('st-title').textContent='Rezervimi u Konfirmua!';
+    document.getElementById('st-title').style.color='#5DBF88';
+    document.getElementById('st-desc').innerHTML=`Urime! Rezervimi juaj u pranua.<br><span style="font-size:13px">Detajet u dërguan në emailin tuaj.</span>`;
+    const tag=document.querySelector('#st-card .tag');
+    if(tag){tag.style.background='rgba(58,140,92,.15)';tag.style.color='#5DBF88';tag.style.borderColor='rgba(58,140,92,.3)';tag.textContent='✓ Konfirmuar';}
+    showToast('✓ Rezervimi u konfirmua!','#3A8C5C');
+  }else{
+    document.getElementById('st-icon').innerHTML=`<div class="s-icon" style="background:rgba(192,64,64,.15);border:2px solid rgba(192,64,64,.4)">✕</div>`;
+    document.getElementById('st-title').textContent='Rezervimi u Anulua';
+    document.getElementById('st-title').style.color='#E06060';
+    document.getElementById('st-desc').innerHTML=`Na vjen keq, restoranti nuk mund ta pranojë.<br><span style="font-size:13px">Ju lutem provoni një datë tjetër.</span>`;
+    const tag=document.querySelector('#st-card .tag');
+    if(tag){tag.style.background='rgba(192,64,64,.15)';tag.style.color='#E06060';tag.style.borderColor='rgba(192,64,64,.3)';tag.textContent='✕ Anuluar';}
+    showToast('✕ Rezervimi u anulua','#C04040');
+  }
+}
+
+function resetHome(){
+  currentReservationId=null;
+  if(evtSource){evtSource.close();evtSource=null;}
+  document.getElementById('f-name').value='';document.getElementById('f-email').value='';
+  document.getElementById('f-phone').value='';document.getElementById('f-date').value='';
+  document.getElementById('f-time').value='';document.getElementById('f-notes').value='';
+  document.getElementById('submit-btn').disabled=true;
+  document.getElementById('submit-btn').textContent='✦ Dërgo Rezervimin';
+  document.getElementById('summary').style.display='none';
+  selectedPersons=2;document.querySelectorAll('.p-btn').forEach((b,i)=>{b.classList.toggle('active',i===1);});
+  show('screen-home');
+}
+
+function showToast(msg,color){
+  const t=document.getElementById('toast');
+  t.innerHTML=`<div style="font-size:13px;font-weight:500;color:${color}">${msg}</div>`;
+  t.style.display='block';t.style.borderColor=color+'55';
+  setTimeout(()=>{t.style.display='none';},5000);
+}
+
+loadRestaurants();
+</script>
+</body>
+</html>
