@@ -6,78 +6,130 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const RESTAURANTS = [
-  { id: 1,  name: "Tiffany & White",    city: "Prishtinë", cuisine: "Fine Dining",  emoji: "✦", gradient: "135deg,#1a0a30,#2d1060" },
-  { id: 2,  name: "Pjata",              city: "Prishtinë", cuisine: "Mesdhetare",   emoji: "◈", gradient: "135deg,#1f0a00,#4a2000" },
-  { id: 3,  name: "Renaissance Lounge", city: "Prizren",   cuisine: "Fusion",       emoji: "❋", gradient: "135deg,#0a1a00,#1e4000" },
-  { id: 4,  name: "Kalaja Lounge",      city: "Prizren",   cuisine: "Tradicionale", emoji: "◉", gradient: "135deg,#001a15,#003d30" },
-  { id: 5,  name: "Ora Restaurant",     city: "Pejë",      cuisine: "Kombëtare",    emoji: "✿", gradient: "135deg,#1a0018,#3d0038" },
-  { id: 6,  name: "Lidhja",             city: "Gjakovë",   cuisine: "Ballkanike",   emoji: "◆", gradient: "135deg,#000d1a,#001b3d" },
-  { id: 7,  name: "Dukagjini Palace",   city: "Mitrovicë", cuisine: "Fine Dining",  emoji: "♦", gradient: "135deg,#1a0f00,#3d2500" },
-  { id: 8,  name: "Bardha",             city: "Ferizaj",   cuisine: "Grille",       emoji: "◇", gradient: "135deg,#0a0a1a,#1a1a3d" },
-  { id: 9,  name: "Shtepia e Gjonit",   city: "Prishtinë", cuisine: "Tradicionale", emoji: "⌂", gradient: "135deg,#1a0a00,#3d2000" },
-  { id: 10, name: "Mangata",            city: "Prishtinë", cuisine: "Modern",       emoji: "◎", gradient: "135deg,#001a1a,#003d3d" },
-];
-
+// ── In-memory DB ──────────────────────────────────────────────────────────
 let reservations = [];
 let sseClients = [];
 
-// SSE — clients regjistrohen me restaurantId të tyre
+// Manager accounts — admin manages these
+let managers = [
+  { id: 1, username: 'Adora Restaurant', password: 'admin', restaurant: 'Adora Restaurant', city: 'Prishtinë', active: true }
+];
+
+// Admin account (fixed)
+const ADMIN = { username: 'admin', password: 'admin' };
+
+// ── SSE ───────────────────────────────────────────────────────────────────
 app.get('/api/events', (req, res) => {
-  const restaurantId = req.query.restaurantId ? parseInt(req.query.restaurantId) : null;
+  const managerId = req.query.managerId ? parseInt(req.query.managerId) : null;
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.flushHeaders();
-  const client = { res, restaurantId };
+  const client = { res, managerId };
   sseClients.push(client);
   res.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`);
   req.on('close', () => { sseClients = sseClients.filter(c => c !== client); });
 });
 
-function broadcast(data, targetRestaurantId) {
+function broadcast(data, targetManagerId) {
   sseClients.forEach(client => {
-    const matchesManager = client.restaurantId && client.restaurantId === targetRestaurantId;
-    const isUserClient   = !client.restaurantId;
-    if (matchesManager || isUserClient) {
+    if (!targetManagerId || !client.managerId || client.managerId === targetManagerId) {
       client.res.write(`data: ${JSON.stringify(data)}\n\n`);
     }
   });
 }
 
-app.get('/api/restaurants', (req, res) => res.json(RESTAURANTS));
+// ── Admin Auth ────────────────────────────────────────────────────────────
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === ADMIN.username && password === ADMIN.password) {
+    res.json({ ok: true });
+  } else {
+    res.status(401).json({ error: 'Kredencialet janë të gabuara' });
+  }
+});
 
+// ── Admin: Manage managers ────────────────────────────────────────────────
+app.get('/api/admin/managers', (req, res) => {
+  res.json(managers);
+});
+
+app.post('/api/admin/managers', (req, res) => {
+  const { username, password, restaurant, city } = req.body;
+  if (!username || !password || !restaurant) return res.status(400).json({ error: 'Të dhënat janë të pakompletuara' });
+  if (managers.find(m => m.username.toLowerCase() === username.toLowerCase())) {
+    return res.status(400).json({ error: 'Ky username ekziston tashmë' });
+  }
+  const manager = { id: Date.now(), username, password, restaurant, city: city || '', active: true };
+  managers.push(manager);
+  res.json(manager);
+});
+
+app.patch('/api/admin/managers/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const idx = managers.findIndex(m => m.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Nuk u gjet' });
+  managers[idx] = { ...managers[idx], ...req.body };
+  res.json(managers[idx]);
+});
+
+app.delete('/api/admin/managers/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  managers = managers.filter(m => m.id !== id);
+  reservations = reservations.filter(r => r.managerId !== id);
+  res.json({ ok: true });
+});
+
+// ── Manager Auth ──────────────────────────────────────────────────────────
+app.post('/api/manager/login', (req, res) => {
+  const { username, password } = req.body;
+  const manager = managers.find(m =>
+    m.username.toLowerCase() === username.toLowerCase() &&
+    m.password === password &&
+    m.active
+  );
+  if (manager) {
+    res.json({ ok: true, manager: { id: manager.id, username: manager.username, restaurant: manager.restaurant, city: manager.city } });
+  } else {
+    res.status(401).json({ error: 'Kredencialet janë të gabuara' });
+  }
+});
+
+// ── Reservations ──────────────────────────────────────────────────────────
 app.get('/api/reservations', (req, res) => {
-  const rid = req.query.restaurantId ? parseInt(req.query.restaurantId) : null;
-  res.json(rid ? reservations.filter(r => r.restaurantId === rid) : reservations);
+  const managerId = req.query.managerId ? parseInt(req.query.managerId) : null;
+  res.json(managerId ? reservations.filter(r => r.managerId === managerId) : reservations);
 });
 
 app.post('/api/reservations', (req, res) => {
   const reservation = {
     id: Date.now(),
     ...req.body,
-    restaurantId: parseInt(req.body.restaurantId),
+    managerId: parseInt(req.body.managerId),
     status: 'pending',
     createdAt: new Date().toISOString()
   };
   reservations.push(reservation);
-  broadcast({ type: 'new_reservation', reservation }, reservation.restaurantId);
+  broadcast({ type: 'new_reservation', reservation }, reservation.managerId);
   res.json(reservation);
 });
 
 app.patch('/api/reservations/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const idx = reservations.findIndex(r => r.id === id);
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  if (idx === -1) return res.status(404).json({ error: 'Nuk u gjet' });
   reservations[idx].status = req.body.status;
   const r = reservations[idx];
-  broadcast({ type: 'status_update', id, status: r.status, restaurantId: r.restaurantId });
+  broadcast({ type: 'status_update', id, status: r.status }, r.managerId);
   res.json(r);
 });
 
+// ── Routes ────────────────────────────────────────────────────────────────
 app.get('/manager', (req, res) => res.sendFile(path.join(__dirname, 'public', 'manager.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 
+// ── Start ─────────────────────────────────────────────────────────────────
 function getLocalIP() {
   const nets = os.networkInterfaces();
   for (const name of Object.keys(nets))
@@ -86,13 +138,14 @@ function getLocalIP() {
   return 'localhost';
 }
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   const ip = getLocalIP();
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('  ✦  REZERVO KOSOVË  —  Server aktiv!');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`\n  💻 LAPTOP (User):     http://localhost:${PORT}`);
-  console.log(`  📱 TELEFON (Manager): http://${ip}:${PORT}/manager`);
+  console.log(`\n  💻 User:    http://localhost:${PORT}`);
+  console.log(`  📱 Manager: http://${ip}:${PORT}/manager`);
+  console.log(`  🔧 Admin:   http://${ip}:${PORT}/admin`);
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 });
