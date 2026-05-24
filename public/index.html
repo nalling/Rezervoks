@@ -3,188 +3,416 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rezervo Kosovë</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Adora Restaurant — Rezervo & Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#09080A;--surface:#131016;--s2:#1C1A21;
-  --gold:#C8A96E;--gold-l:#E2C98A;--cream:#F0E8D8;
-  --muted:#7A7080;--green:#3A8C5C;--red:#C04040;
-  --border:rgba(200,169,110,0.18);
+  --bg:#0D0D0D;--surface:#181818;--card:#1E1E1E;
+  --orange:#E8610A;--orange-l:#FF7A1F;--orange-d:#C4500A;
+  --cream:#F5F0EB;--muted:#999;--border:#2A2A2A;--white:#fff;
 }
 body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100vh}
-h1,h2,h3,.serif{font-family:'Cormorant Garamond',serif}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+.serif{font-family:'Playfair Display',serif}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--orange);border-radius:2px}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
 
+.screen{display:none}.screen.active{display:block}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#1a0800 0%,#0D0D0D 50%,#0D0D0D 100%);
+  position:relative;overflow:hidden;padding:40px 24px;text-align:center
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(232,97,10,.12) 0%,transparent 70%);
+  pointer-events:none
+}
+.hero-ornament{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--orange),transparent)
+}
+.logo-wrap{display:flex;align-items:center;gap:16px;margin-bottom:32px;animation:fadeUp .6s ease}
+.logo-icon{width:60px;height:60px}
+.logo-name{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;letter-spacing:.1em;color:var(--white)}
+.logo-sub{font-size:11px;letter-spacing:.35em;color:var(--orange);text-transform:uppercase;margin-top:2px}
+.hero-divider{width:60px;height:1px;background:var(--orange);margin:0 auto 24px;opacity:.5;animation:fadeUp .6s .1s ease both}
+.hero-welcome{font-size:13px;letter-spacing:.2em;color:var(--muted);margin-bottom:48px;animation:fadeUp .6s .15s ease both}
+
+/* Main buttons */
+.main-btns{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:360px;animation:fadeUp .6s .2s ease both}
+.main-btn{
+  border-radius:20px;padding:28px 16px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:all .3s;border:none;-webkit-user-select:none;user-select:none
+}
+.main-btn:active{transform:scale(.97)}
+.main-btn-icon{font-size:36px}
+.main-btn-label{font-family:'Playfair Display',serif;font-size:18px;font-weight:600}
+.main-btn-sub{font-size:11px;font-weight:400;opacity:.7;letter-spacing:.05em}
+
+.btn-menu{background:var(--card);border:1px solid var(--border);color:var(--cream)}
+.btn-menu:hover{border-color:var(--orange);background:#232323;transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+
+.btn-rezervo{background:linear-gradient(135deg,var(--orange-d),var(--orange-l));color:#fff}
+.btn-rezervo:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(232,97,10,.35)}
+
+.hero-footer{margin-top:40px;font-size:11px;color:var(--muted);letter-spacing:.1em;animation:fadeUp .6s .3s ease both}
+
+/* ── MENU SCREEN ── */
+#screen-menu{background:var(--bg);min-height:100vh}
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:16px 20px;display:flex;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)
+}
+.back-btn{
+  background:transparent;border:1px solid var(--border);color:var(--cream);
+  border-radius:10px;padding:8px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:13px;transition:all .2s
+}
+.back-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* Nav tabs */
+.nav-wrapper{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:20}
+.nav-scroll{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 16px}
+.nav-scroll::-webkit-scrollbar{display:none}
+.tab{
+  padding:14px 18px;font-size:13px;font-weight:500;color:var(--muted);
+  cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;
+  transition:all .2s;-webkit-user-select:none;user-select:none
+}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.swipe-hint{
+  display:flex;align-items:center;gap:6px;padding:7px 16px;
+  font-size:11px;color:var(--muted);background:rgba(232,97,10,.06)
+}
+.swipe-finger{animation:pulse 2s infinite}
+
+/* Menu content */
+.menu-content{padding:20px 16px 60px;max-width:600px;margin:0 auto}
+.section{display:none}.section.active{display:block;animation:fadeIn .3s ease}
+.sec-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--white);margin-bottom:6px}
+.sec-bar{width:36px;height:2px;background:var(--orange);margin-bottom:20px;border-radius:2px}
+.sub-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--orange);margin:20px 0 10px;font-weight:600}
+.item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+.item:last-child{border-bottom:none}
+.item-name{font-size:14px;color:var(--cream)}
+.item-price{font-size:14px;font-weight:700;color:var(--orange);white-space:nowrap;margin-left:12px}
+
+/* Size rows (pizza) */
+.size-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+.size-row:last-child{border-bottom:none}
+.size-name{font-size:14px;color:var(--cream)}
+.size-prices{display:flex;gap:16px}
+.size-price{font-size:13px;font-weight:600;color:var(--orange)}
+.size-lbl{font-size:10px;color:var(--muted);margin-right:3px}
+
+/* Ice cream grid */
+.ice-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.ice-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.ice-item .item-name{font-size:13px}
+.ice-item .item-price{font-size:13px}
+
+.menu-footer{text-align:center;padding:32px 20px 16px;border-top:1px solid var(--border);margin-top:16px}
+.menu-footer-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--orange);letter-spacing:3px;margin-bottom:4px}
+.menu-footer-sub{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+
+/* ── BOOKING SCREEN ── */
+#screen-booking{background:var(--bg);min-height:100vh}
 input,select,textarea{
-  background:var(--s2);border:1px solid var(--border);color:var(--cream);
+  background:var(--card);border:1px solid var(--border);color:var(--cream);
   border-radius:10px;padding:13px 16px;font-family:'DM Sans',sans-serif;
   font-size:14px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s
 }
-input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,169,110,.1)}
-select option{background:#1C1A21}
+input:focus,select:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,97,10,.1)}
+select option{background:#1E1E1E}
 textarea{resize:vertical;min-height:76px}
-
-.btn-gold{
-  background:linear-gradient(135deg,#B8943E,#E2C98A,#B8943E);
-  color:#1a1308;border:none;border-radius:12px;padding:15px 28px;
-  font-family:'DM Sans',sans-serif;font-weight:600;font-size:15px;
-  cursor:pointer;transition:all .3s;width:100%
-}
-.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,169,110,.3)}
-.btn-gold:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.btn-ghost{background:transparent;color:var(--muted);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;transition:color .2s}
-.btn-ghost:hover{color:var(--cream)}
-.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.05em}
-
-/* ── SCREENS ── */
-.screen{display:none}
-.screen.active{display:block}
-
-/* HOME */
-.topbar{
-  background:var(--bg);border-bottom:1px solid var(--border);
-  padding:18px 24px;position:sticky;top:0;z-index:20;
-  backdrop-filter:blur(12px)
-}
-.search-wrap{position:relative;margin-bottom:12px}
-.search-wrap input{padding-left:42px}
-.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
-.city-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-.city-btn{
-  background:var(--s2);color:var(--muted);border:1px solid var(--border);
-  border-radius:20px;padding:6px 16px;font-size:12px;font-weight:500;
-  cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif
-}
-.city-btn.active{background:var(--gold);color:#1a1308;border-color:var(--gold)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;padding:24px}
-
-/* Restaurant card */
-.r-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:20px;
-  overflow:hidden;cursor:pointer;transition:all .35s;
-  animation:fadeUp .4s ease both
-}
-.r-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.4)}
-.r-card-hero{height:130px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.r-card-symbol{font-size:80px;opacity:.15;transition:transform .5s}
-.r-card:hover .r-card-symbol{transform:scale(1.15)}
-.r-card-fade{position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,var(--surface),transparent)}
-.r-card-badge{position:absolute;top:12px;right:12px}
-.r-card-body{padding:14px 18px 18px}
-
-/* Detail */
-.detail-hero{height:210px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-.info-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
-
-/* Form */
-.form-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:18px}
-.form-row{display:grid;gap:14px;margin-bottom:14px}
+.form-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:16px}
+.form-row{display:grid;gap:13px;margin-bottom:13px}
 .form-row.two{grid-template-columns:1fr 1fr}
 .lbl{font-size:11px;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
-.persons-row{display:flex;gap:9px;flex-wrap:wrap}
-.p-btn{
-  width:48px;height:48px;border-radius:11px;font-weight:600;font-size:15px;
-  cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;
-  background:var(--s2);color:var(--cream);border:1px solid var(--border)
-}
-.p-btn.active{background:var(--gold);color:#1a1308;border-color:var(--gold)}
-.summary-box{background:rgba(200,169,110,.06);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-top:14px}
+.p-row{display:flex;gap:9px;flex-wrap:wrap}
+.p-btn{width:48px;height:48px;border-radius:11px;font-weight:600;font-size:15px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;background:var(--card);color:var(--cream);border:1px solid var(--border)}
+.p-btn.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.p-btn:hover:not(.active){border-color:var(--orange)}
+.btn-orange{background:linear-gradient(135deg,var(--orange-d),var(--orange-l));color:#fff;border:none;border-radius:12px;padding:15px 28px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:all .3s;width:100%}
+.btn-orange:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,97,10,.3)}
+.btn-orange:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.summary-box{background:rgba(232,97,10,.07);border:1px solid rgba(232,97,10,.2);border-radius:12px;padding:15px 18px;margin-top:14px}
 
 /* Status */
 .status-center{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
-.spinner{width:88px;height:88px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--gold);animation:spin 1.5s linear infinite;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;position:relative}
+.spinner{width:88px;height:88px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--orange);animation:spin 1.5s linear infinite;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;position:relative}
 .spinner::after{content:"⏳";font-size:30px;position:absolute}
 .s-icon{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 28px}
 .status-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:360px;width:100%;margin:16px auto}
+.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500}
 
-/* Toast */
-#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--gold);border-radius:16px;padding:16px 20px;max-width:300px;z-index:999;display:none;animation:slideDown .4s ease}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border-radius:14px;padding:14px 18px;max-width:280px;z-index:999;display:none;animation:slideDown .3s ease;border:1px solid var(--border)}
 </style>
 </head>
 <body>
 
-<!-- ══ HOME SCREEN ══════════════════════════════════════ -->
-<div id="screen-home" class="screen active">
-  <div class="topbar">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+<!-- ══ LANDING ══════════════════════════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="hero">
+    <div class="hero-ornament"></div>
+
+    <div class="logo-wrap">
+      <svg class="logo-icon" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="60" height="60" rx="14" fill="#E8610A"/>
+        <path d="M30 12 L44 28 L30 22 L16 28 Z" fill="white"/>
+        <rect x="21" y="28" width="18" height="20" rx="2" fill="white"/>
+        <rect x="26" y="32" width="8" height="16" rx="1.5" fill="#E8610A"/>
+      </svg>
       <div>
-        <div style="font-size:10px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:3px">Platforma</div>
-        <h1 class="serif" style="font-size:26px;font-weight:400;background:linear-gradient(135deg,var(--gold),var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Rezervo Kosovë</h1>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></div>
-        <span style="font-size:11px;color:var(--muted)" id="rest-count">…</span>
+        <div class="logo-name">ADORA</div>
+        <div class="logo-sub">Restaurant · Prishtinë</div>
       </div>
     </div>
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input id="search" type="text" placeholder="Kërko restorant...">
-    </div>
-    <div class="city-row" id="city-row"></div>
-  </div>
-  <div class="grid" id="rest-grid"></div>
-</div>
 
-<!-- ══ DETAIL SCREEN ════════════════════════════════════ -->
-<div id="screen-detail" class="screen">
-  <div id="detail-hero" class="detail-hero"></div>
-  <div style="max-width:600px;margin:0 auto;padding:0 22px 50px">
-    <p id="detail-desc" style="font-size:15px;color:var(--muted);line-height:1.8;margin:22px 0"></p>
-    <div class="info-grid" id="detail-info"></div>
-    <button class="btn-gold" onclick="goBooking()">✦ Bëj Rezervim</button>
+    <div class="hero-divider"></div>
+    <div class="hero-welcome">✦ Mirësevini ✦</div>
+
+    <div class="main-btns">
+      <button class="main-btn btn-menu" onclick="showMenu()">
+        <div class="main-btn-icon">🍽</div>
+        <div class="main-btn-label">Menu</div>
+        <div class="main-btn-sub">Shiko menunë</div>
+      </button>
+      <button class="main-btn btn-rezervo" onclick="showBooking()">
+        <div class="main-btn-icon">📅</div>
+        <div class="main-btn-label">Rezervo</div>
+        <div class="main-btn-sub">Bëj rezervim</div>
+      </button>
+    </div>
+
+    <div class="hero-footer">📍 Prishtinë, Kosovë &nbsp;·&nbsp; 🕐 08:00 – 23:00</div>
   </div>
 </div>
 
-<!-- ══ BOOKING SCREEN ═══════════════════════════════════ -->
-<div id="screen-booking" class="screen">
-  <div style="background:var(--bg);border-bottom:1px solid var(--border);padding:18px 22px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)">
-    <button class="btn-ghost" onclick="goDetail()" style="border:1px solid var(--border);border-radius:10px;padding:8px 14px">← Kthehu</button>
+<!-- ══ MENU SCREEN ══════════════════════════════════════ -->
+<div id="screen-menu" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showLanding()">← Kthehu</button>
     <div>
-      <div class="serif" style="font-size:17px;font-weight:500" id="book-rest-name"></div>
-      <div style="font-size:12px;color:var(--muted)" id="book-rest-city"></div>
+      <div style="font-size:15px;font-weight:600;color:var(--white)">Adora Restaurant</div>
+      <div style="font-size:11px;color:var(--muted)">Menu Digjitale</div>
     </div>
   </div>
-  <div style="max-width:540px;margin:0 auto;padding:28px 22px 60px">
+
+  <div class="nav-wrapper">
+    <div class="nav-scroll">
+      <div class="tab active" onclick="showSection('mengjesi',this)">🍳 Mëngjesi</div>
+      <div class="tab" onclick="showSection('sandwich',this)">🥪 Sandwich</div>
+      <div class="tab" onclick="showSection('sallata',this)">🥗 Sallatat</div>
+      <div class="tab" onclick="showSection('pasta',this)">🍝 Pasta</div>
+      <div class="tab" onclick="showSection('pizza',this)">🍕 Pizza</div>
+      <div class="tab" onclick="showSection('skara',this)">🥩 Skara</div>
+      <div class="tab" onclick="showSection('pije',this)">☕ Pijet</div>
+      <div class="tab" onclick="showSection('desert',this)">🍰 Desert</div>
+    </div>
+    <div class="swipe-hint"><span class="swipe-finger">👆</span> Rrëshqit për të parë kategoritë</div>
+  </div>
+
+  <div class="menu-content">
+
+    <!-- MËNGJESI -->
+    <div class="section active" id="mengjesi">
+      <div class="sec-title">Mëngjesi</div><div class="sec-bar"></div>
+      <div class="sub-label">Omleta</div>
+      <div class="item"><span class="item-name">Omlet adora</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Omlet suxhuk</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Omlet përshutë</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Omlet djath</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Omlet perime</span><span class="item-price">2.50€</span></div>
+      <div class="sub-label">Supa</div>
+      <div class="item"><span class="item-name">Supë pule</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Supë viqi</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Supë perime</span><span class="item-price">2.00€</span></div>
+      <div class="item"><span class="item-name">Supë peshku</span><span class="item-price">3.00€</span></div>
+      <div class="sub-label">Të tjera</div>
+      <div class="item"><span class="item-name">Pjatë djathi</span><span class="item-price">4.00€</span></div>
+      <div class="item"><span class="item-name">Pjatë proshutë</span><span class="item-price">5.00€</span></div>
+      <div class="item"><span class="item-name">Vezë të skuqura (2 cope)</span><span class="item-price">1.50€</span></div>
+      <div class="item"><span class="item-name">Gjalpë + reçel</span><span class="item-price">1.00€</span></div>
+    </div>
+
+    <!-- SANDWICH -->
+    <div class="section" id="sandwich">
+      <div class="sec-title">Sandwich</div><div class="sec-bar"></div>
+      <div class="item"><span class="item-name">Sandwich pule</span><span class="item-price">3.50€</span></div>
+      <div class="item"><span class="item-name">Sandwich suxhuk</span><span class="item-price">3.00€</span></div>
+      <div class="item"><span class="item-name">Sandwich proshutë</span><span class="item-price">3.00€</span></div>
+      <div class="item"><span class="item-name">Sandwich djath</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Sandwich miks</span><span class="item-price">4.00€</span></div>
+      <div class="item"><span class="item-name">Sandwich perime</span><span class="item-price">3.00€</span></div>
+      <div class="item"><span class="item-name">Hotdog</span><span class="item-price">2.50€</span></div>
+    </div>
+
+    <!-- SALLATAT -->
+    <div class="section" id="sallata">
+      <div class="sec-title">Sallatat</div><div class="sec-bar"></div>
+      <div class="item"><span class="item-name">Sallate çoban</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Sallate pranverore</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Sallate greke</span><span class="item-price">3.50€</span></div>
+      <div class="item"><span class="item-name">Sallate cezar me pule</span><span class="item-price">4.50€</span></div>
+      <div class="item"><span class="item-name">Sallate cezar me salmon</span><span class="item-price">5.50€</span></div>
+      <div class="item"><span class="item-name">Sallate me ton</span><span class="item-price">4.50€</span></div>
+      <div class="item"><span class="item-name">Sallate rukola</span><span class="item-price">3.50€</span></div>
+    </div>
+
+    <!-- PASTA -->
+    <div class="section" id="pasta">
+      <div class="sec-title">Pasta & Rizotto</div><div class="sec-bar"></div>
+      <div class="sub-label">Pasta</div>
+      <div class="item"><span class="item-name">Spageti bologneze</span><span class="item-price">5.00€</span></div>
+      <div class="item"><span class="item-name">Spageti karbonara</span><span class="item-price">5.50€</span></div>
+      <div class="item"><span class="item-name">Spageti me salcë kërpudhash</span><span class="item-price">5.00€</span></div>
+      <div class="item"><span class="item-name">Pene arrabbiata</span><span class="item-price">4.50€</span></div>
+      <div class="item"><span class="item-name">Pene me salcë krem & pule</span><span class="item-price">5.50€</span></div>
+      <div class="item"><span class="item-name">Fettuccine alfredo</span><span class="item-price">5.50€</span></div>
+      <div class="item"><span class="item-name">Lasagna</span><span class="item-price">6.00€</span></div>
+      <div class="sub-label">Rizotto</div>
+      <div class="item"><span class="item-name">Rizotto me kërpudha</span><span class="item-price">5.50€</span></div>
+      <div class="item"><span class="item-name">Rizotto me pule</span><span class="item-price">6.00€</span></div>
+      <div class="item"><span class="item-name">Rizotto me fruta deti</span><span class="item-price">7.00€</span></div>
+    </div>
+
+    <!-- PIZZA -->
+    <div class="section" id="pizza">
+      <div class="sec-title">Pizza</div><div class="sec-bar"></div>
+      <div style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:10px">
+        <span style="font-size:11px;color:var(--muted)">🔹 Vogël &nbsp; 🔸 Madhe</span>
+      </div>
+      <div class="size-row"><span class="size-name">Margherita</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>4.00€</span><span class="size-price"><span class="size-lbl">🔸</span>6.00€</span></div></div>
+      <div class="size-row"><span class="size-name">Proshutë</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>4.50€</span><span class="size-price"><span class="size-lbl">🔸</span>6.50€</span></div></div>
+      <div class="size-row"><span class="size-name">Salami</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>4.50€</span><span class="size-price"><span class="size-lbl">🔸</span>6.50€</span></div></div>
+      <div class="size-row"><span class="size-name">Quattro formaggi</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>5.00€</span><span class="size-price"><span class="size-lbl">🔸</span>7.50€</span></div></div>
+      <div class="size-row"><span class="size-name">Capricciosa</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>5.00€</span><span class="size-price"><span class="size-lbl">🔸</span>7.50€</span></div></div>
+      <div class="size-row"><span class="size-name">Tonno</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>5.00€</span><span class="size-price"><span class="size-lbl">🔸</span>7.50€</span></div></div>
+      <div class="size-row"><span class="size-name">Vegetariane</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>4.50€</span><span class="size-price"><span class="size-lbl">🔸</span>6.50€</span></div></div>
+      <div class="size-row"><span class="size-name">Pizza adora (speciale)</span><div class="size-prices"><span class="size-price"><span class="size-lbl">🔹</span>5.50€</span><span class="size-price"><span class="size-lbl">🔸</span>8.50€</span></div></div>
+    </div>
+
+    <!-- SKARA -->
+    <div class="section" id="skara">
+      <div class="sec-title">Skara & Peshk</div><div class="sec-bar"></div>
+      <div class="sub-label">Skara</div>
+      <div class="item"><span class="item-name">Qebap (6 copë)</span><span class="item-price">5.00€</span></div>
+      <div class="item"><span class="item-name">Shish qebap pule</span><span class="item-price">5.50€</span></div>
+      <div class="item"><span class="item-name">Shish qebap viqi</span><span class="item-price">6.50€</span></div>
+      <div class="item"><span class="item-name">Biftek viqi</span><span class="item-price">8.00€</span></div>
+      <div class="item"><span class="item-name">Fileto pule</span><span class="item-price">6.00€</span></div>
+      <div class="item"><span class="item-name">Miks skare</span><span class="item-price">9.00€</span></div>
+      <div class="item"><span class="item-name">Kotele derri</span><span class="item-price">7.00€</span></div>
+      <div class="sub-label">Peshk</div>
+      <div class="item"><span class="item-name">Salmon i pjekur</span><span class="item-price">8.50€</span></div>
+      <div class="item"><span class="item-name">Levrek i pjekur</span><span class="item-price">7.50€</span></div>
+      <div class="item"><span class="item-name">Kallamar i skuqur</span><span class="item-price">7.00€</span></div>
+      <div class="item"><span class="item-name">Karkaleca</span><span class="item-price">9.00€</span></div>
+      <div class="sub-label">Shtesat</div>
+      <div class="item"><span class="item-name">Patate të skuqura</span><span class="item-price">2.00€</span></div>
+      <div class="item"><span class="item-name">Patate të pjekura</span><span class="item-price">2.00€</span></div>
+      <div class="item"><span class="item-name">Oriz</span><span class="item-price">1.50€</span></div>
+    </div>
+
+    <!-- PIJET -->
+    <div class="section" id="pije">
+      <div class="sec-title">Pijet</div><div class="sec-bar"></div>
+      <div class="sub-label">Kafja</div>
+      <div class="item"><span class="item-name">Espresso</span><span class="item-price">1.00€</span></div>
+      <div class="item"><span class="item-name">Macchiato</span><span class="item-price">1.20€</span></div>
+      <div class="item"><span class="item-name">Cappuccino</span><span class="item-price">1.50€</span></div>
+      <div class="item"><span class="item-name">Latte</span><span class="item-price">2.00€</span></div>
+      <div class="item"><span class="item-name">Americano</span><span class="item-price">1.50€</span></div>
+      <div class="item"><span class="item-name">Frapë</span><span class="item-price">2.00€</span></div>
+      <div class="sub-label">Çaji & Tjera</div>
+      <div class="item"><span class="item-name">Çaj i ngrohtë</span><span class="item-price">1.00€</span></div>
+      <div class="item"><span class="item-name">Ujë (0.5L)</span><span class="item-price">0.50€</span></div>
+      <div class="item"><span class="item-name">Ujë (1.5L)</span><span class="item-price">1.00€</span></div>
+      <div class="item"><span class="item-name">Lëng frutash</span><span class="item-price">1.50€</span></div>
+      <div class="item"><span class="item-name">Smoothie</span><span class="item-price">2.50€</span></div>
+      <div class="sub-label">Pije Freskuese</div>
+      <div class="item"><span class="item-name">Coca-Cola / Fanta / Sprite</span><span class="item-price">1.50€</span></div>
+      <div class="item"><span class="item-name">Red Bull</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Ayran</span><span class="item-price">1.00€</span></div>
+      <div class="sub-label">Birra</div>
+      <div class="item"><span class="item-name">Birra vendore (0.5L)</span><span class="item-price">2.00€</span></div>
+      <div class="item"><span class="item-name">Birra e importuar</span><span class="item-price">2.50€</span></div>
+    </div>
+
+    <!-- DESERT -->
+    <div class="section" id="desert">
+      <div class="sec-title">Desert</div><div class="sec-bar"></div>
+      <div class="item"><span class="item-name">Tiramisu</span><span class="item-price">3.00€</span></div>
+      <div class="item"><span class="item-name">Cheesecake</span><span class="item-price">3.00€</span></div>
+      <div class="item"><span class="item-name">Fondant çokollatë</span><span class="item-price">3.50€</span></div>
+      <div class="item"><span class="item-name">Bakllavë</span><span class="item-price">2.00€</span></div>
+      <div class="item"><span class="item-name">Trileçe</span><span class="item-price">2.50€</span></div>
+      <div class="item"><span class="item-name">Pallaqinka me nutella</span><span class="item-price">2.50€</span></div>
+      <div class="sub-label">Akullore</div>
+      <div class="ice-grid">
+        <div class="ice-item"><span class="item-name">Vanilje</span><span class="item-price">1.50€</span></div>
+        <div class="ice-item"><span class="item-name">Çokollatë</span><span class="item-price">1.50€</span></div>
+        <div class="ice-item"><span class="item-name">Luleshtrydhe</span><span class="item-price">1.50€</span></div>
+        <div class="ice-item"><span class="item-name">Pistache</span><span class="item-price">2.00€</span></div>
+        <div class="ice-item"><span class="item-name">Mango</span><span class="item-price">2.00€</span></div>
+        <div class="ice-item"><span class="item-name">Miks (3 shije)</span><span class="item-price">3.50€</span></div>
+      </div>
+    </div>
+
+    <div class="menu-footer">
+      <div class="menu-footer-name">ADORA</div>
+      <div class="menu-footer-sub">Restaurant · Prishtinë</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BOOKING SCREEN ══════════════════════════════════ -->
+<div id="screen-booking" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showLanding()">← Kthehu</button>
+    <div>
+      <div style="font-size:15px;font-weight:600;color:var(--white)">Adora Restaurant</div>
+      <div style="font-size:11px;color:var(--muted)">Bëj rezervim</div>
+    </div>
+  </div>
+  <div style="max-width:540px;margin:0 auto;padding:24px 18px 60px">
     <div class="form-box">
-      <h2 class="serif" style="font-size:24px;font-weight:400;margin-bottom:4px">Detajet e Rezervimit</h2>
+      <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:4px">Detajet e Rezervimit</h2>
       <p style="color:var(--muted);font-size:13px;margin-bottom:22px">Plotëso formularin dhe menaxheri do të konfirmojë</p>
       <div class="form-row two">
         <div><label class="lbl">Emri & Mbiemri *</label><input id="f-name" placeholder="Agim Berisha"></div>
         <div><label class="lbl">Telefoni</label><input id="f-phone" type="tel" placeholder="+383 44..."></div>
       </div>
-      <div class="form-row">
-        <div><label class="lbl">Email (për konfirmim) *</label><input id="f-email" type="email" placeholder="agim@gmail.com"></div>
-      </div>
+      <div class="form-row"><div><label class="lbl">Email (për konfirmim) *</label><input id="f-email" type="email" placeholder="agim@gmail.com"></div></div>
       <div class="form-row two">
         <div><label class="lbl">Data *</label><input id="f-date" type="date"></div>
-        <div>
-          <label class="lbl">Ora *</label>
-          <select id="f-time"><option value="">Zgjidh orën</option></select>
-        </div>
+        <div><label class="lbl">Ora *</label><select id="f-time"><option value="">Zgjidh orën</option></select></div>
       </div>
       <div style="margin-bottom:14px">
         <label class="lbl">Numri i Personave *</label>
-        <div class="persons-row" id="persons-row"></div>
+        <div class="p-row" id="p-row"></div>
       </div>
-      <div>
-        <label class="lbl">Shënime (opsionale)</label>
-        <textarea id="f-notes" placeholder="Preferenca speciale, ditëlindje, tavolinë jashtë..."></textarea>
-      </div>
+      <div><label class="lbl">Shënime (opsionale)</label><textarea id="f-notes" placeholder="Preferenca speciale, ditëlindje, tavolinë jashtë..."></textarea></div>
       <div class="summary-box" id="summary" style="display:none">
-        <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Rezyme</div>
+        <div style="font-size:10px;color:var(--orange);text-transform:uppercase;letter-spacing:.12em;margin-bottom:9px">Rezyme</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:13px;color:var(--muted)" id="summary-content"></div>
       </div>
     </div>
-    <button class="btn-gold" id="submit-btn" onclick="submitReservation()" disabled>✦ Dërgo Rezervimin</button>
+    <button class="btn-orange" id="submit-btn" onclick="submitReservation()" disabled>✦ Dërgo Rezervimin</button>
     <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">📧 Konfirmimi dërgohet automatikisht në email</p>
   </div>
 </div>
@@ -193,144 +421,61 @@ textarea{resize:vertical;min-height:76px}
 <div id="screen-status" class="screen">
   <div class="status-center">
     <div id="st-icon"></div>
-    <h2 class="serif" id="st-title" style="font-size:32px;font-weight:400;margin-bottom:10px"></h2>
-    <p id="st-desc" style="color:var(--muted);line-height:1.7;max-width:310px;margin:0 auto 20px"></p>
+    <h2 style="font-family:'Playfair Display',serif;font-size:30px;font-weight:600" id="st-title"></h2>
+    <p id="st-desc" style="color:var(--muted);line-height:1.7;max-width:300px;margin:10px auto 20px"></p>
     <div class="status-card" id="st-card"></div>
-    <div style="margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <button onclick="resetHome()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:12px 22px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px">← Rezervim i ri</button>
+    <div style="margin-top:22px">
+      <button onclick="showLanding()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:12px 22px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px">← Kthehu</button>
     </div>
-    <p id="st-hint" style="margin-top:18px;font-size:11px;color:var(--muted);opacity:.5"></p>
+    <p id="st-hint" style="margin-top:16px;font-size:11px;color:var(--muted);opacity:.5"></p>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ─── State ────────────────────────────────────────────────────────────────
-let restaurants = [];
-let selectedRest = null;
+// ─── Manager ID — hardcoded for Adora (id=1 from server) ─────────────────
+const MANAGER_ID = 1;
 let selectedPersons = 2;
 let currentReservationId = null;
 let evtSource = null;
-let activeCity = 'Të gjitha';
 
 // ─── Init ─────────────────────────────────────────────────────────────────
 document.getElementById('f-date').min = new Date().toISOString().split('T')[0];
-
 const timeSelect = document.getElementById('f-time');
-for(let h=10;h<=23;h++) for(let m of['00','30']){
-  if(h===23&&m==='30') break;
-  const o=document.createElement('option');o.value=o.textContent=`${h}:${m}`;timeSelect.appendChild(o);
+for(let h=8;h<=23;h++) for(let m of['00','30']){
+  if(h===23&&m==='30')break;
+  const o=document.createElement('option');o.value=o.textContent=`${h<10?'0'+h:h}:${m}`;timeSelect.appendChild(o);
 }
-
-const personsRow = document.getElementById('persons-row');
+const pRow=document.getElementById('p-row');
 [1,2,3,4,5,6,7,8,10,12].forEach(n=>{
-  const b=document.createElement('button');
-  b.className='p-btn'+(n===2?' active':'');b.textContent=n;
+  const b=document.createElement('button');b.className='p-btn'+(n===2?' active':'');b.textContent=n;
   b.onclick=()=>{document.querySelectorAll('.p-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');selectedPersons=n;updateSummary();};
-  personsRow.appendChild(b);
+  pRow.appendChild(b);
 });
-
 ['f-name','f-email','f-date','f-time'].forEach(id=>{
   document.getElementById(id).addEventListener('input',()=>{validateForm();updateSummary();});
 });
 
-document.getElementById('search').addEventListener('input', renderGrid);
-
-// ─── Fetch restaurants ────────────────────────────────────────────────────
-async function loadRestaurants(){
-  const r = await fetch('/api/restaurants');
-  restaurants = await r.json();
-  document.getElementById('rest-count').textContent = restaurants.length+' restorante';
-  buildCityFilter();
-  renderGrid();
-}
-
-function buildCityFilter(){
-  const cities = ['Të gjitha',...new Set(restaurants.map(r=>r.city))];
-  const row = document.getElementById('city-row');
-  row.innerHTML='';
-  cities.forEach(c=>{
-    const b=document.createElement('button');
-    b.className='city-btn'+(c===activeCity?' active':'');
-    b.textContent=c;
-    b.onclick=()=>{activeCity=c;document.querySelectorAll('.city-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderGrid();};
-    row.appendChild(b);
-  });
-}
-
-function renderGrid(){
-  const q = document.getElementById('search').value.toLowerCase();
-  const list = restaurants.filter(r=>{
-    const matchCity = activeCity==='Të gjitha'||r.city===activeCity;
-    const matchQ = !q||r.name.toLowerCase().includes(q)||r.cuisine.toLowerCase().includes(q)||r.city.toLowerCase().includes(q);
-    return matchCity&&matchQ;
-  });
-  const grid = document.getElementById('rest-grid');
-  grid.innerHTML='';
-  if(!list.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">🍽</div><p>Nuk u gjet asnjë restorant</p></div>';return;}
-  list.forEach((r,i)=>{
-    const d=document.createElement('div');d.className='r-card';d.style.animationDelay=(i*.06)+'s';
-    d.innerHTML=`
-      <div class="r-card-hero" style="background:linear-gradient(${r.gradient})">
-        <div class="r-card-symbol">${r.emoji}</div>
-        <div class="r-card-fade"></div>
-        <div class="r-card-badge"><span class="tag" style="background:rgba(255,255,255,.07);color:var(--cream);border:1px solid rgba(255,255,255,.12);font-size:10px">${r.cuisine}</span></div>
-      </div>
-      <div class="r-card-body">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-          <h3 class="serif" style="font-size:19px;font-weight:500;line-height:1.2">${r.name}</h3>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">📍 ${r.city}</div>
-        <div style="display:flex;justify-content:flex-end"><span style="font-size:12px;color:var(--gold);font-weight:500">Rezervo →</span></div>
-      </div>`;
-    d.onclick=()=>goDetail(r);
-    grid.appendChild(d);
-  });
-}
-
 // ─── Navigation ───────────────────────────────────────────────────────────
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showLanding(){show('screen-landing');}
+function showMenu(){show('screen-menu');}
+function showBooking(){show('screen-booking');}
 
-function goDetail(r){
-  selectedRest=r;
-  const hero=document.getElementById('detail-hero');
-  hero.style.background=`linear-gradient(${r.gradient})`;
-  hero.innerHTML=`
-    <div style="font-size:100px;opacity:.12">${r.emoji}</div>
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%)"></div>
-    <button onclick="show('screen-home')" style="position:absolute;top:18px;left:18px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 14px;color:var(--cream);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px">← Kthehu</button>
-    <div style="position:absolute;bottom:20px;left:22px;right:22px">
-      <span class="tag" style="background:rgba(255,255,255,.08);color:var(--cream);border:1px solid rgba(255,255,255,.12);margin-bottom:8px">${r.cuisine} · ${r.city}</span>
-      <h2 class="serif" style="font-size:clamp(24px,5vw,36px);font-weight:400">${r.name}</h2>
-    </div>`;
-  document.getElementById('detail-desc').textContent = `Restoranti ${r.name} në ${r.city} — kuzhina ${r.cuisine.toLowerCase()} e klasit të lartë. Rezervoni tavolinën tuaj sot dhe shijoni eksperiencën gastronomike.`;
-  document.getElementById('detail-info').innerHTML=[
-    {icon:'🕐',lbl:'Orari',val:'12:00 – 23:00'},
-    {icon:'📍',lbl:'Qyteti',val:r.city},
-    {icon:'🍽',lbl:'Kuzhina',val:r.cuisine},
-    {icon:'👥',lbl:'Kapaciteti',val:'50+ vende'},
-  ].map(x=>`<div class="info-card"><div style="font-size:18px;margin-bottom:5px">${x.icon}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">${x.lbl}</div><div style="font-size:13px;font-weight:500">${x.val}</div></div>`).join('');
-  show('screen-detail');
+function showSection(id,tab){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  tab.classList.add('active');
+  tab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 }
-
-function goBooking(){
-  document.getElementById('book-rest-name').textContent=selectedRest.name;
-  document.getElementById('book-rest-city').textContent=selectedRest.city;
-  show('screen-booking');
-}
-
-function goDetail2(){show('screen-detail');}
 
 // ─── Form ─────────────────────────────────────────────────────────────────
 function validateForm(){
-  const ok=document.getElementById('f-name').value.trim()&&
-            document.getElementById('f-email').value.includes('@')&&
-            document.getElementById('f-date').value&&
-            document.getElementById('f-time').value;
+  const ok=document.getElementById('f-name').value.trim()&&document.getElementById('f-email').value.includes('@')&&document.getElementById('f-date').value&&document.getElementById('f-time').value;
   document.getElementById('submit-btn').disabled=!ok;
 }
-
 function updateSummary(){
   const name=document.getElementById('f-name').value.trim();
   const date=document.getElementById('f-date').value;
@@ -338,123 +483,58 @@ function updateSummary(){
   const el=document.getElementById('summary');
   if(name&&date&&time){
     el.style.display='block';
-    document.getElementById('summary-content').innerHTML=`
-      <span>🏪 ${selectedRest?.name||''}</span><span>📅 ${date}</span>
-      <span>🕐 ${time}</span><span>👥 ${selectedPersons} persona</span>`;
-  }else{el.style.display='none';}
+    document.getElementById('summary-content').innerHTML=`<span>🏪 Adora Restaurant</span><span>📅 ${date}</span><span>🕐 ${time}</span><span>👥 ${selectedPersons} persona</span>`;
+  }else el.style.display='none';
 }
 
 // ─── Submit ────────────────────────────────────────────────────────────────
 async function submitReservation(){
   const btn=document.getElementById('submit-btn');
   btn.disabled=true;btn.textContent='Duke dërguar...';
-  const body={
-    name:document.getElementById('f-name').value.trim(),
-    email:document.getElementById('f-email').value.trim(),
-    phone:document.getElementById('f-phone').value.trim(),
-    date:document.getElementById('f-date').value,
-    time:document.getElementById('f-time').value,
-    persons:selectedPersons,
-    notes:document.getElementById('f-notes').value.trim(),
-    restaurantId:selectedRest.id,
-    restaurantName:selectedRest.name,
-    restaurantCity:selectedRest.city,
-  };
+  const body={name:document.getElementById('f-name').value.trim(),email:document.getElementById('f-email').value.trim(),phone:document.getElementById('f-phone').value.trim(),date:document.getElementById('f-date').value,time:document.getElementById('f-time').value,persons:selectedPersons,notes:document.getElementById('f-notes').value.trim(),managerId:MANAGER_ID,restaurant:'Adora Restaurant'};
   try{
     const res=await fetch('/api/reservations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const reservation=await res.json();
     currentReservationId=reservation.id;
-    showWaiting(reservation);
-    startSSE();
-  }catch(e){
-    btn.disabled=false;btn.textContent='✦ Dërgo Rezervimin';
-    showToast('❌ Gabim! Kontrollo lidhjen.','#C04040');
-  }
+    showWaiting(reservation);startSSE();
+  }catch(e){btn.disabled=false;btn.textContent='✦ Dërgo Rezervimin';showToast('❌ Gabim! Kontrollo lidhjen.','#C04040');}
 }
 
 // ─── SSE ──────────────────────────────────────────────────────────────────
 function startSSE(){
   if(evtSource)evtSource.close();
   evtSource=new EventSource('/api/events');
-  evtSource.onmessage=(e)=>{
-    const data=JSON.parse(e.data);
-    if(data.type==='status_update'&&data.id===currentReservationId) updateStatus(data.status);
-  };
-  evtSource.onerror=()=>setTimeout(()=>pollStatus(),3000);
+  evtSource.onmessage=e=>{const d=JSON.parse(e.data);if(d.type==='status_update'&&d.id===currentReservationId)updateStatus(d.status);};
+  evtSource.onerror=()=>setTimeout(pollStatus,3000);
 }
-
 async function pollStatus(){
   if(!currentReservationId)return;
-  try{
-    const res=await fetch('/api/reservations');
-    const all=await res.json();
-    const r=all.find(x=>x.id===currentReservationId);
-    if(r&&r.status!=='pending')updateStatus(r.status);
-    else setTimeout(()=>pollStatus(),3000);
-  }catch{setTimeout(()=>pollStatus(),4000);}
+  try{const res=await fetch('/api/reservations');const all=await res.json();const r=all.find(x=>x.id===currentReservationId);if(r&&r.status!=='pending')updateStatus(r.status);else setTimeout(pollStatus,3000);}catch{setTimeout(pollStatus,4000);}
 }
 
-// ─── Status screens ───────────────────────────────────────────────────────
-function showWaiting(reservation){
-  document.getElementById('st-icon').innerHTML=`<div class="spinner"></div>`;
+// ─── Status ────────────────────────────────────────────────────────────────
+function showWaiting(r){
+  document.getElementById('st-icon').innerHTML='<div class="spinner"></div>';
   document.getElementById('st-title').textContent='Duke pritur konfirmimin...';
   document.getElementById('st-title').style.color='var(--cream)';
-  document.getElementById('st-desc').innerHTML=`Rezervimi u dërgua tek <strong style="color:var(--cream)">${reservation.restaurantName}</strong>.<br>Menaxheri do të konfirmojë nga telefoni.`;
-  document.getElementById('st-card').innerHTML=`
-    <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Detajet</div>
-    <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);text-align:left">
-      <div>👤 ${reservation.name}</div><div>📧 ${reservation.email}</div>
-      <div>📅 ${reservation.date} &nbsp; 🕐 ${reservation.time}</div>
-      <div>👥 ${reservation.persons} persona</div>
-      <div style="margin-top:8px"><span class="tag" style="background:rgba(200,169,110,.1);color:var(--gold);border:1px solid rgba(200,169,110,.2)">⏳ Në pritje</span></div>
-    </div>`;
+  document.getElementById('st-desc').innerHTML=`Rezervimi u dërgua tek <strong style="color:var(--white)">Adora Restaurant</strong>.<br>Menaxheri do të konfirmojë nga telefoni.`;
+  document.getElementById('st-card').innerHTML=`<div style="font-size:10px;color:var(--orange);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Detajet</div><div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);text-align:left"><div>👤 ${r.name}</div><div>📧 ${r.email}</div><div>📅 ${r.date} · 🕐 ${r.time}</div><div>👥 ${r.persons} persona</div><div style="margin-top:8px"><span class="tag" style="background:rgba(232,97,10,.1);color:var(--orange);border:1px solid rgba(232,97,10,.2)">⏳ Në pritje</span></div></div>`;
   document.getElementById('st-hint').textContent='🔄 Lidhur live — do të njoftohesh menjëherë';
   show('screen-status');
 }
-
 function updateStatus(status){
   if(evtSource){evtSource.close();evtSource=null;}
   document.getElementById('st-hint').textContent='';
-  if(status==='confirmed'){
-    document.getElementById('st-icon').innerHTML=`<div class="s-icon" style="background:rgba(58,140,92,.15);border:2px solid rgba(58,140,92,.4)">✓</div>`;
-    document.getElementById('st-title').textContent='Rezervimi u Konfirmua!';
-    document.getElementById('st-title').style.color='#5DBF88';
-    document.getElementById('st-desc').innerHTML=`Urime! Rezervimi juaj u pranua.<br><span style="font-size:13px">Detajet u dërguan në emailin tuaj.</span>`;
-    const tag=document.querySelector('#st-card .tag');
-    if(tag){tag.style.background='rgba(58,140,92,.15)';tag.style.color='#5DBF88';tag.style.borderColor='rgba(58,140,92,.3)';tag.textContent='✓ Konfirmuar';}
-    showToast('✓ Rezervimi u konfirmua!','#3A8C5C');
-  }else{
-    document.getElementById('st-icon').innerHTML=`<div class="s-icon" style="background:rgba(192,64,64,.15);border:2px solid rgba(192,64,64,.4)">✕</div>`;
-    document.getElementById('st-title').textContent='Rezervimi u Anulua';
-    document.getElementById('st-title').style.color='#E06060';
-    document.getElementById('st-desc').innerHTML=`Na vjen keq, restoranti nuk mund ta pranojë.<br><span style="font-size:13px">Ju lutem provoni një datë tjetër.</span>`;
-    const tag=document.querySelector('#st-card .tag');
-    if(tag){tag.style.background='rgba(192,64,64,.15)';tag.style.color='#E06060';tag.style.borderColor='rgba(192,64,64,.3)';tag.textContent='✕ Anuluar';}
-    showToast('✕ Rezervimi u anulua','#C04040');
-  }
+  const ic=status==='confirmed';
+  document.getElementById('st-icon').innerHTML=`<div class="s-icon" style="background:${ic?'rgba(58,140,92,.15)':'rgba(192,64,64,.15)'};border:2px solid ${ic?'rgba(58,140,92,.4)':'rgba(192,64,64,.4)'}">${ic?'✓':'✕'}</div>`;
+  document.getElementById('st-title').textContent=ic?'Rezervimi u Konfirmua!':'Rezervimi u Anulua';
+  document.getElementById('st-title').style.color=ic?'#5DBF88':'#E06060';
+  document.getElementById('st-desc').innerHTML=ic?`Urime! Rezervimi juaj u pranua.<br><span style="font-size:13px">Detajet u dërguan në emailin tuaj.</span>`:`Na vjen keq, restoranti nuk mund ta pranojë.<br><span style="font-size:13px">Ju lutem provoni një datë tjetër.</span>`;
+  const tag=document.querySelector('#st-card .tag');
+  if(tag){tag.style.background=ic?'rgba(58,140,92,.15)':'rgba(192,64,64,.15)';tag.style.color=ic?'#5DBF88':'#E06060';tag.style.borderColor=ic?'rgba(58,140,92,.3)':'rgba(192,64,64,.3)';tag.textContent=ic?'✓ Konfirmuar':'✕ Anuluar';}
+  showToast(ic?'✓ Rezervimi u konfirmua!':'✕ Rezervimi u anulua',ic?'#3A8C5C':'#C04040');
 }
-
-function resetHome(){
-  currentReservationId=null;
-  if(evtSource){evtSource.close();evtSource=null;}
-  document.getElementById('f-name').value='';document.getElementById('f-email').value='';
-  document.getElementById('f-phone').value='';document.getElementById('f-date').value='';
-  document.getElementById('f-time').value='';document.getElementById('f-notes').value='';
-  document.getElementById('submit-btn').disabled=true;
-  document.getElementById('submit-btn').textContent='✦ Dërgo Rezervimin';
-  document.getElementById('summary').style.display='none';
-  selectedPersons=2;document.querySelectorAll('.p-btn').forEach((b,i)=>{b.classList.toggle('active',i===1);});
-  show('screen-home');
-}
-
-function showToast(msg,color){
-  const t=document.getElementById('toast');
-  t.innerHTML=`<div style="font-size:13px;font-weight:500;color:${color}">${msg}</div>`;
-  t.style.display='block';t.style.borderColor=color+'55';
-  setTimeout(()=>{t.style.display='none';},5000);
-}
-
-loadRestaurants();
+function showToast(msg,color){const t=document.getElementById('toast');t.innerHTML=`<div style="font-size:13px;font-weight:500;color:${color}">${msg}</div>`;t.style.display='block';t.style.borderColor=color+'55';setTimeout(()=>{t.style.display='none';},5000);}
 </script>
 </body>
 </html>
