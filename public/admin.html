@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Rezervo Kosovë</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#09080A;--surface:#131016;--s2:#1C1A21;--gold:#C8A96E;--cream:#F0E8D8;--muted:#7A7080;--green:#3A8C5C;--red:#C04040;--border:rgba(200,169,110,0.18)}
+body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100vh}
+.serif{font-family:'Playfair Display',serif}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.92)}100%{opacity:1;transform:scale(1)}}
+
+.screen{display:none}.screen.active{display:block}
+
+/* ── LOGIN ── */
+#screen-login{min-height:100vh;display:none;align-items:center;justify-content:center;padding:24px}
+#screen-login.active{display:flex}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px 30px;width:100%;max-width:380px;animation:fadeUp .5s ease}
+input,select{background:var(--s2);border:1px solid var(--border);color:var(--cream);border-radius:10px;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;margin-bottom:12px}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,169,110,.1)}
+input::placeholder{color:var(--muted)}
+.btn-gold{background:linear-gradient(135deg,#B8943E,#E2C98A,#B8943E);color:#1a1308;border:none;border-radius:11px;padding:14px;width:100%;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .3s}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,169,110,.3)}
+.error-msg{color:#E06060;font-size:13px;text-align:center;margin-top:8px;display:none}
+
+/* ── DASHBOARD ── */
+#screen-dash{min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.container{max-width:800px;margin:0 auto;padding:28px 20px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;color:var(--gold)}
+.stat-l{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* Manager cards */
+.managers-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.btn-add{background:var(--gold);color:#1a1308;border:none;border-radius:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-add:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,169,110,.3)}
+
+.m-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;animation:fadeUp .4s ease}
+.m-avatar{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,rgba(200,169,110,.2),rgba(200,169,110,.05));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.m-info{flex:1;min-width:0}
+.m-name{font-weight:600;font-size:15px;margin-bottom:2px}
+.m-sub{font-size:12px;color:var(--muted)}
+.m-actions{display:flex;gap:8px;flex-shrink:0}
+.btn-edit{background:transparent;border:1px solid var(--border);color:var(--cream);border-radius:9px;padding:7px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;transition:all .2s}
+.btn-edit:hover{border-color:var(--gold);color:var(--gold)}
+.btn-del{background:transparent;border:1px solid rgba(192,64,64,.3);color:#E06060;border-radius:9px;padding:7px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;transition:all .2s}
+.btn-del:hover{background:rgba(192,64,64,.1)}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:30px;width:100%;max-width:420px;animation:popIn .35s ease}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:20px}
+.modal input{margin-bottom:12px}
+.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.btn-cancel-m{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-cancel-m:hover{border-color:var(--gold);color:var(--cream)}
+
+/* ── CONFIRM DELETE ── */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.confirm-overlay.active{display:flex}
+.confirm-box{background:var(--surface);border:1px solid rgba(192,64,64,.3);border-radius:20px;padding:28px;width:100%;max-width:360px;text-align:center;animation:popIn .35s ease}
+.btn-confirm-del{background:var(--red);color:#fff;border:none;border-radius:10px;padding:13px 24px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-confirm-del:hover{background:#A03030}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--gold);border-radius:14px;padding:14px 18px;max-width:280px;z-index:999;display:none;font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:10px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:8px">Panel i Administratorit</div>
+      <h1 class="serif" style="font-size:28px;font-weight:600;background:linear-gradient(135deg,var(--gold),#E2C98A);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Rezervo Kosovë</h1>
+      <div style="width:36px;height:1px;background:var(--gold);margin:12px auto;opacity:.4"></div>
+      <p style="font-size:13px;color:var(--muted)">Hyr si administrator</p>
+    </div>
+    <input id="a-user" type="text" placeholder="Username" autocomplete="off">
+    <input id="a-pass" type="password" placeholder="Fjalëkalimi">
+    <div id="login-err" class="error-msg">❌ Kredencialet janë të gabuara</div>
+    <button class="btn-gold" style="margin-top:4px" onclick="doLogin()">Hyr si Admin →</button>
+    <div style="margin-top:18px;background:rgba(200,169,110,.06);border:1px solid rgba(200,169,110,.15);border-radius:12px;padding:12px 14px">
+      <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Kredencialet</div>
+      <div style="font-size:12px;color:var(--muted)">👤 Username: <strong style="color:var(--cream)">admin</strong><br>🔑 Fjalëkalimi: <strong style="color:var(--cream)">admin</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══════════════════════════════════════ -->
+<div id="screen-dash" class="screen">
+  <div class="topbar">
+    <div>
+      <div style="font-size:10px;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;margin-bottom:1px">Administrator</div>
+      <div class="serif" style="font-size:18px;font-weight:600">Rezervo Kosovë — Admin</div>
+    </div>
+    <button onclick="doLogout()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px">Dil</button>
+  </div>
+
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Menaxherë gjithsej</div></div>
+      <div class="stat"><div class="stat-n" id="s-active" style="color:#5DBF88">0</div><div class="stat-l">Aktive</div></div>
+      <div class="stat"><div class="stat-n" id="s-inactive" style="color:var(--muted)">0</div><div class="stat-l">Joaktive</div></div>
+    </div>
+
+    <!-- Managers -->
+    <div class="managers-header">
+      <h2 class="serif" style="font-size:22px;font-weight:600">Llogaritë e Menaxherëve</h2>
+      <button class="btn-add" onclick="openAddModal()">+ Shto Restorant</button>
+    </div>
+    <div id="managers-list"></div>
+  </div>
+</div>
+
+<!-- ══ ADD/EDIT MODAL ══════════════════════════════════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Shto Restorant të Ri</div>
+    <input id="m-restaurant" placeholder="Emri i restorantit *">
+    <input id="m-city" placeholder="Qyteti">
+    <input id="m-username" placeholder="Username (për login) *">
+    <input id="m-password" type="text" placeholder="Fjalëkalimi *">
+    <div id="modal-err" style="color:#E06060;font-size:12px;margin-bottom:10px;display:none"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel-m" onclick="closeModal()">Anulo</button>
+      <button class="btn-gold" id="modal-submit" onclick="saveManager()">Ruaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DELETE CONFIRM ══════════════════════════════════ -->
+<div class="confirm-overlay" id="confirm-del">
+  <div class="confirm-box">
+    <div style="font-size:40px;margin-bottom:14px">🗑️</div>
+    <h3 class="serif" style="font-size:20px;margin-bottom:8px">Fshi Llogarinë?</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:22px" id="del-name"></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <button class="btn-cancel-m" onclick="closeConfirm()">Anulo</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">Fshi</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let managers = [];
+let editingId = null;
+let deletingId = null;
+
+// ─── Login ─────────────────────────────────────────────────────────────────
+document.getElementById('a-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('a-user').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+async function doLogin(){
+  const username=document.getElementById('a-user').value.trim();
+  const password=document.getElementById('a-pass').value.trim();
+  const err=document.getElementById('login-err');
+  try{
+    const res=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+    if(res.ok){
+      document.getElementById('screen-login').classList.remove('active');
+      document.getElementById('screen-dash').classList.add('active');
+      loadManagers();
+    }else{
+      err.style.display='block';
+      setTimeout(()=>err.style.display='none',2500);
+    }
+  }catch(e){err.style.display='block';err.textContent='❌ Gabim serveri';}
+}
+
+function doLogout(){
+  document.getElementById('screen-dash').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  document.getElementById('a-user').value='';document.getElementById('a-pass').value='';
+}
+
+// ─── Load managers ─────────────────────────────────────────────────────────
+async function loadManagers(){
+  const res=await fetch('/api/admin/managers');
+  managers=await res.json();
+  renderManagers();
+}
+
+function renderManagers(){
+  document.getElementById('s-total').textContent=managers.length;
+  document.getElementById('s-active').textContent=managers.filter(m=>m.active).length;
+  document.getElementById('s-inactive').textContent=managers.filter(m=>!m.active).length;
+
+  const list=document.getElementById('managers-list');
+  if(!managers.length){
+    list.innerHTML='<div style="text-align:center;padding:48px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">🏪</div><p>Nuk ka restorante të shtuara akoma</p></div>';
+    return;
+  }
+  list.innerHTML='';
+  managers.forEach((m,i)=>{
+    const d=document.createElement('div');d.className='m-card';d.style.animationDelay=(i*.06)+'s';
+    d.innerHTML=`
+      <div class="m-avatar">🏪</div>
+      <div class="m-info">
+        <div class="m-name">${m.restaurant}</div>
+        <div class="m-sub">
+          👤 ${m.username} &nbsp;·&nbsp; 🔑 ${m.password}
+          ${m.city?` &nbsp;·&nbsp; 📍 ${m.city}`:''}
+        </div>
+        <div style="margin-top:6px">
+          <span class="tag" style="background:${m.active?'rgba(58,140,92,.15)':'rgba(122,112,128,.1)'};color:${m.active?'#5DBF88':'var(--muted)'};border:1px solid ${m.active?'rgba(58,140,92,.3)':'rgba(122,112,128,.2)'}">
+            ${m.active?'● Aktiv':'○ Joaktiv'}
+          </span>
+        </div>
+      </div>
+      <div class="m-actions">
+        <button class="btn-edit" onclick="openEditModal(${m.id})">✏️ Ndrysho</button>
+        <button class="btn-del" onclick="openConfirm(${m.id},'${m.restaurant.replace(/'/g,"\\'")}')">🗑️ Fshi</button>
+      </div>`;
+    list.appendChild(d);
+  });
+}
+
+// ─── Add/Edit Modal ────────────────────────────────────────────────────────
+function openAddModal(){
+  editingId=null;
+  document.getElementById('modal-title').textContent='Shto Restorant të Ri';
+  document.getElementById('m-restaurant').value='';
+  document.getElementById('m-city').value='';
+  document.getElementById('m-username').value='';
+  document.getElementById('m-password').value='admin';
+  document.getElementById('modal-err').style.display='none';
+  document.getElementById('modal').classList.add('active');
+}
+
+function openEditModal(id){
+  const m=managers.find(x=>x.id===id);if(!m)return;
+  editingId=id;
+  document.getElementById('modal-title').textContent='Ndrysho Llogarinë';
+  document.getElementById('m-restaurant').value=m.restaurant;
+  document.getElementById('m-city').value=m.city||'';
+  document.getElementById('m-username').value=m.username;
+  document.getElementById('m-password').value=m.password;
+  document.getElementById('modal-err').style.display='none';
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('active');editingId=null;}
+
+async function saveManager(){
+  const restaurant=document.getElementById('m-restaurant').value.trim();
+  const city=document.getElementById('m-city').value.trim();
+  const username=document.getElementById('m-username').value.trim();
+  const password=document.getElementById('m-password').value.trim();
+  const errEl=document.getElementById('modal-err');
+  if(!restaurant||!username||!password){errEl.textContent='⚠️ Plotëso të gjitha fushat e detyrueshme';errEl.style.display='block';return;}
+  try{
+    let res;
+    if(editingId){
+      res=await fetch(`/api/admin/managers/${editingId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({restaurant,city,username,password})});
+    }else{
+      res=await fetch('/api/admin/managers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({restaurant,city,username,password})});
+    }
+    if(!res.ok){const d=await res.json();errEl.textContent='❌ '+d.error;errEl.style.display='block';return;}
+    closeModal();loadManagers();
+    showToast(editingId?'✓ Llogaria u ndryshua':'✓ Restoranti u shtua!');
+  }catch(e){errEl.textContent='❌ Gabim serveri';errEl.style.display='block';}
+}
+
+// ─── Delete ────────────────────────────────────────────────────────────────
+function openConfirm(id,name){
+  deletingId=id;
+  document.getElementById('del-name').innerHTML=`Do të fshihet llogaria e <strong style="color:var(--cream)">${name}</strong> dhe të gjitha rezervimet e saj.<br><br>Ky veprim nuk mund të zhbëhet.`;
+  document.getElementById('confirm-del').classList.add('active');
+}
+function closeConfirm(){document.getElementById('confirm-del').classList.remove('active');deletingId=null;}
+async function confirmDelete(){
+  if(!deletingId)return;
+  await fetch(`/api/admin/managers/${deletingId}`,{method:'DELETE'});
+  closeConfirm();loadManagers();showToast('🗑️ Llogaria u fshi');
+}
+
+// ─── Toggle active ─────────────────────────────────────────────────────────
+async function toggleActive(id,current){
+  await fetch(`/api/admin/managers/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:!current})});
+  loadManagers();
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
+</script>
+</body>
+</html>
